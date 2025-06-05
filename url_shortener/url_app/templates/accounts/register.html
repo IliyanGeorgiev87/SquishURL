@@ -15,6 +15,9 @@
 <body class="user-select-none d-flex justify-content-center align-items-center" style="width: 100%; height: 100vh;">
     <div class="container rounded shadow p-5" style="width: 25vw;">
         <h2 class="text-primary text-center mb-4">Register</h2>
+        {% if error %}
+            <p class="text-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>{{ error }}</p>
+        {% endif %}
         <form method="POST" class="d-flex flex-column">
             <div class="mb-3">
                 <label for="exampleFormControlInput1" class="form-label">Username:</label>
