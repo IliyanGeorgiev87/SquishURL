@@ -12,7 +12,25 @@
     <link rel="stylesheet" href="fonts.css">
 </head>
 </head>
-<body>
-    
+<body class="user-select-none d-flex justify-content-center align-items-center" style="width: 100%; height: 100vh;">
+    <div class="container rounded shadow p-5" style="width: 25vw;">
+        <h2 class="text-primary text-center mb-4">Register</h2>
+        <form method="POST" class="d-flex flex-column">
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Username:</label>
+                <input type="text" class="form-control" name="username" required maxlength="100">
+            </div>
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Email:</label>
+                <input type="email" class="form-control" name="email" required maxlength="100">
+            </div>
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Password:</label>
+                <input type="password" class="form-control" name="password" required maxlength="100">
+            </div>
+            <button type="submit" class="btn btn-primary align-self-center mt-2">Register</button>
+            <p class="align-self-center text-center mt-3">Already have an account? <a href="#" class="link-primary fw-semibold">Log in <i class="bi bi-box-arrow-in-right"></i></a></p>
+        </form>
+    </div>
 </body>
 </html>

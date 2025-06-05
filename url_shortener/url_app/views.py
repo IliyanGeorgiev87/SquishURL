@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
-# Create your views here.
+#* ===== ACCOUNT SYSTEM ===== *#
+#* ===== MISCCELLANEOUS ===== *#
+def Home(request):
+    return render(request, "misc/index.html")
+def Redirect(request):
+    return redirect("home")
