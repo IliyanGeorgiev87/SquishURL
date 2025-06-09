@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .models import UserProfile
 
 #* ===== ACCOUNT SYSTEM ===== *#
+
 def Register(request):
 
     if request.method == "POST":
@@ -78,3 +79,9 @@ def Redirect(request):
 @login_required
 def Dashboard(request):
     return render(request, "app/dashboard.html")
+
+#* ====== URL SHORTENING &  URL STUFF ===== *#
+
+def ShortenUrl(request):
+    
+    return render(request, 'app/url_create.html')
