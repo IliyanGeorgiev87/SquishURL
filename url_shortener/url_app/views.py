@@ -6,6 +6,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from .models import UserProfile, ShortenedUrl
+from django.shortcuts import get_object_or_404
 import uuid
 import time
 from datetime import datetime
@@ -84,7 +85,8 @@ def Redirect(request):
 
 @login_required
 def Dashboard(request):
-    return render(request, "app/dashboard.html")
+    link = ShortenedUrl.objects.all()
+    return render(request, "app/dashboard.html", {"link": link})
 
 #* ====== URL SHORTENING &  URL STUFF ===== *#
 
@@ -160,8 +162,6 @@ def ShortenUrl(request):
 
     return render(request, 'app/url_create.html')
 
-"""
-'DIRS': [
-            'templates/',
-        ],
-"""
+def DeleteURL(request, pk):
+    links = get_object_or_404(ShortenedUrl, pk = pk)
+    return render(request, 'app/url_delete.html', {"links": links})
