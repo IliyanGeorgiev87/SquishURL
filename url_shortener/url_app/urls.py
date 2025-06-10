@@ -8,7 +8,8 @@ urlpatterns = [
     #* == ACCOUNTS == *#
     path('accounts/register', views.Register, name='register'),
     path('accounts/login', views.Login, name='login'),
-    path('accounts/my-account/', views.AccountDetail, name='account'),
+    path('accounts/account/', views.AccountDetail, name='account'),
+    path('accounts/account/delete', views.DeleteAccount, name='account_delete'),
     #* == DASHBOARD & APP == *#
     path('dashboard/', views.Dashboard, name='dashboard'),
     path('dashboard/link/create/', views.ShortenUrl, name = "create_url"),

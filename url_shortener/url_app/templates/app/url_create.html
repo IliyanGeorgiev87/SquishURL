@@ -25,17 +25,14 @@
                 </p>
             </div>
             {% endif %}
-
-            {% if messages %}
-                <ul class="messages">
-                    {% for message in messages %}
-                        <li class="{{ message.tags }}">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
             <div class="mb-3">
                 <label class="form-label">Original URL:</label>
                 <input type="url" class="form-control" required maxlength="2048" name="original_url">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Shortened URL length: <span class="opacity-50 ms-2">*leave blank for 20</span></label>
+                <input type="number" class="form-control-number" name="length" max="50" min="5">
             </div>
             
             <div class="mb-3">
@@ -88,6 +85,7 @@
 </html>
 
 <script>
+    /*
     document.addEventListener('DOMContentLoaded', function() {
         const datetimeInput = document.getElementById('myDatetimeInput');
 
@@ -105,9 +103,14 @@
 
         datetimeInput.setAttribute('min', formattedDateTime);
     });
+    */
 </script>
 
 <style>
+    @import url(https://fonts.googleapis.com/css?family=Poppins:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
+    *{
+        font-family: "Poppins", sans-serif;
+    }
     .wrapper {
         width: 30%;
         margin: 0 auto;
@@ -121,24 +124,5 @@
         .wrapper {
             width: 95%;
         }
-    }
-    /** messages **/
-    .messages li {
-        list-style: none;
-        padding: 10px;
-        margin-bottom: 10px;
-        border-radius: 5px;
-    }
-
-    .messages li.success {
-        color: #28a745;
-    }
-
-    .messages li.error {
-        color: #dc3545;
-    }
-
-    .messages li.info {
-        color: #007bff;
     }
 </style>

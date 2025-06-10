@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.hashers import make_password
@@ -92,50 +91,72 @@ def Dashboard(request):
 
 def ShortenUrl(request):
     if request.method == "POST":
-        original_url = request.POST.get("original_url")
-        custom_alias = request.POST.get("custom_alias")
-        expiry_date_str = request.POST.get("expiry_date") # 14:25 25/06/2025
+        original_url = request.POST.get("original_url", "").strip()
+        custom_alias = request.POST.get("custom_alias", "").strip()
+        expiry_date_str = request.POST.get("expiry_date", "").strip()  # HH:MM DD/MM/YYYY
         active_status = request.POST.get("active")
-        max_uses_str = request.POST.get("max_uses")
-        url_password = request.POST.get("url_password")
+        max_uses_str = request.POST.get("max_uses", "").strip()
+        url_password = request.POST.get("url_password", "").strip()
+        provided_length = request.POST.get('length')
 
         hashed_url_password = make_password(url_password) if url_password else None
-        short_code = str(uuid.uuid4())[:20]
-
         expiry_date = None
         if expiry_date_str:
             try:
-                # *** CHANGE THE FORMAT STRING HERE ***
                 expiry_date = datetime.strptime(expiry_date_str, '%H:%M %d/%m/%Y')
                 expiry_date = make_aware(expiry_date)
             except ValueError:
-                messages.error(request, "Invalid expiry date format. Please use **HH:MM DD/MM/YYYY**.")
                 return render(request, "app/url_create.html", {
                     "original_url": original_url,
                     "custom_alias": custom_alias,
+                    "expiry_date_str": expiry_date_str,
                     "max_uses_str": max_uses_str,
                     "active_status": active_status,
-                    "expiry_date_str": expiry_date_str,
+                    "error": "Invalid expiry date format. Please use HH:MM DD/MM/YYYY"
                 })
 
         max_uses = None
         if max_uses_str:
             try:
                 max_uses = int(max_uses_str)
+                if max_uses < 1:
+                    raise ValueError
             except ValueError:
-                messages.error(request, "Max uses must be a valid number.")
                 return render(request, "app/url_create.html", {
                     "original_url": original_url,
                     "custom_alias": custom_alias,
                     "expiry_date_str": expiry_date_str,
-                    "active_status": active_status,
                     "max_uses_str": max_uses_str,
+                    "active_status": active_status,
+                    "error": "Max uses must be a positive number!"
                 })
 
         is_active = True if active_status == 'on' else False
 
         current_user = request.user if request.user.is_authenticated else None
 
+        if provided_length == None:
+            provided_length = 20
+        else:
+            pass
+
+        if custom_alias:
+            if ShortenedUrl.objects.filter(custom_code=custom_alias).exists():
+                return render(request, "app/url_create.html", {
+                    "original_url": original_url,
+                    "custom_alias": custom_alias,
+                    "expiry_date_str": expiry_date_str,
+                    "max_uses_str": max_uses_str,
+                    "active_status": active_status,
+                    "error": "The provided alias is already in use! Please choose another one."
+                })
+            short_code = custom_alias
+        else:
+            while True:
+                random_code = str(uuid.uuid4())[:provided_length]
+                if not ShortenedUrl.objects.filter(short_code=random_code).exists():
+                    short_code = random_code
+                    break
         try:
             ShortenedUrl.objects.create(
                 original_url=original_url,
@@ -147,20 +168,29 @@ def ShortenUrl(request):
                 url_password=hashed_url_password,
                 is_active=is_active
             )
-            messages.success(request, "Shortened URL successfully! You will be redirected to the dashboard shortly.")
-            return render(request, 'app/url_create.html', {'redirect_to_dashboard': True})
+            print("Shortened URL created successfully:", short_code)
+            return redirect('dashboard')
 
         except Exception as e:
-            messages.error(request, "Something went wrong! Please try again or choose a different custom alias if one was provided.")
+            print("Error creating ShortenedUrl:", e)
             return render(request, 'app/url_create.html', {
                 "original_url": original_url,
                 "custom_alias": custom_alias,
                 "expiry_date_str": expiry_date_str,
                 "max_uses_str": max_uses_str,
                 "active_status": active_status,
+                "error": "Something went wrong! Please, try again!"
             })
+        
+    return render(request, 'app/url_create.html', {
+        "original_url": "",
+        "custom_alias": "",
+        "expiry_date_str": "",
+        "max_uses_str": "",
+        "active_status": "",
+        "error": ""
+    })
 
-    return render(request, 'app/url_create.html')
 
 def DeleteURL(request, pk):
     links = get_object_or_404(ShortenedUrl, pk = pk)
