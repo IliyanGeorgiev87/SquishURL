@@ -18,6 +18,7 @@
             <p class="text-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>{{ error }}</p>
         {% endif %}
         <form method="POST" class="d-flex flex-column">
+            {% csrf_token %}
             <div class="mb-3">
                 <label for="exampleFormControlInput1" class="form-label">Username:</label>
                 <input type="text" class="form-control" name="username" required maxlength="100">
@@ -31,7 +32,7 @@
                 <input type="password" class="form-control" name="password" required maxlength="100">
             </div>
             <button type="submit" class="btn btn-success align-self-center mt-2">Register</button>
-            <p class="align-self-center text-center mt-3">No account? <a href="#" class="link-success fw-semibold">Register <i class="bi bi-person-plus-fill"></i></a></p>
+            <p class="align-self-center text-center mt-3">No account? <a href="{% url 'register' %}" class="link-success fw-semibold">Register <i class="bi bi-person-plus-fill"></i></a></p>
         </form>
     </div>
 </body>

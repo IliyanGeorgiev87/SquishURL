@@ -19,6 +19,7 @@
             <p class="text-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>{{ error }}</p>
         {% endif %}
         <form method="POST" class="d-flex flex-column">
+            {% csrf_token %}
             <div class="mb-3">
                 <label for="exampleFormControlInput1" class="form-label">Username:</label>
                 <input type="text" class="form-control" name="username" required maxlength="100">

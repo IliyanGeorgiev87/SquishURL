@@ -16,6 +16,22 @@
     <h1 class="text-center text-primary fw-semibold mb-4">Shorten URL</h1>
     <div class="container shadow rounded p-5">
         <form class="d-flex flex-column">
+            {% if error %}
+            <div class="mb-3">
+                <p class="text-danger">
+                    <i class="bi bi-exclamation-octagon-fill me-1"></i>
+                    {{ error }}
+                </p>
+            </div>
+            {% endif %}
+
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li class="{{ message.tags }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
             <div class="mb-3">
                 <label class="form-label">Original URL:</label>
                 <input type="url" class="form-control" required maxlength="2048" name="original_url">
@@ -95,9 +111,33 @@
         width: 30%;
         margin: 0 auto;
     }
+    @media (max-width: 1200px){
+        .wrapper{
+            width: 70%;
+        }
+    }
     @media (max-width: 768px) {
         .wrapper {
             width: 95%;
         }
+    }
+    /** messages **/
+    .messages li {
+        list-style: none;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+
+    .messages li.success {
+        color: #28a745;
+    }
+
+    .messages li.error {
+        color: #dc3545;
+    }
+
+    .messages li.info {
+        color: #007bff;
     }
 </style>

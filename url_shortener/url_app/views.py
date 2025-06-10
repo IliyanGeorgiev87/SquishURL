@@ -52,7 +52,7 @@ def Login(request):
         else:
             return render(request, "accounts/register.html", {"error": "Invalid creditentials!"})
 
-    return render(request, "login.html")
+    return render(request, "accounts/login.html")
 
 @login_required
 def DeleteAccount(request):
@@ -159,3 +159,9 @@ def ShortenUrl(request):
             })
 
     return render(request, 'app/url_create.html')
+
+"""
+'DIRS': [
+            'templates/',
+        ],
+"""
