@@ -11,12 +11,12 @@ class UserProfile(models.Model):
 
 class ShortenedUrl(models.Model):
     original_url = models.URLField(max_length=2048)
-    short_code = models.CharField(max_length=20, unique=True, )
+    short_code = models.CharField(max_length=20, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    custom_code = models.CharField(max_length=20, unique=True, null=True, blank=False)
-    expiry_date = models.DateTimeField()
+    custom_code = models.CharField(max_length=20, unique=True, null=True)
+    expiry_date = models.DateTimeField(null=True, blank=True)
     max_uses = models.IntegerField(null=True, blank=True)
-    current_uses = models.IntegerField(default=0)
+    current_uses = models.IntegerField(default=0, null=True)
     url_password  = models.CharField(max_length=128, null=True, blank=True)
     is_active = models.BooleanField(default=True)

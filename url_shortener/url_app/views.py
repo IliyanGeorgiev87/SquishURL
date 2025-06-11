@@ -84,8 +84,8 @@ def Redirect(request):
 
 @login_required
 def Dashboard(request):
-    link = ShortenedUrl.objects.all()
-    return render(request, "app/dashboard.html", {"link": link})
+    links = ShortenedUrl.objects.all()
+    return render(request, "app/dashboard.html", {"links": links})
 
 #* ====== URL SHORTENING &  URL STUFF ===== *#
 
@@ -195,3 +195,27 @@ def ShortenUrl(request):
 def DeleteURL(request, pk):
     links = get_object_or_404(ShortenedUrl, pk = pk)
     return render(request, 'app/url_delete.html', {"links": links})
+
+def EditURL(request, pk):
+    return render(request, "app/url_edit.html")
+
+def ViewURL(request, pk):
+    link = get_object_or_404(ShortenedUrl, pk = pk)
+    context = {
+        'link': link,
+        'original_url': link.original_url,
+        'short_code': link.short_code,
+        'created_at': link.created_at,
+        'owner': link.owner,
+        'custom_code': link.custom_code,
+        'expiry_date': link.expiry_date,
+        'uses': link.current_uses,
+        'max_uses': link.max_uses,
+        'password': link.url_password,
+        'active': link.is_active
+    }
+    return render(request, 'app/url_view.html', context)
+
+def RedirctURL(request, pk):
+    link = get_object_or_404(ShortenedUrl, pk = pk)
+    return redirect(link.original_url)
