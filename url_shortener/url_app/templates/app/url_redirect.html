@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SquishURL | Redirect to link</title>
+    <!--BOOTSTRAP-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+    <!--BOOTSTRAP ICONS-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+<body class="user-select-none d-flex align-items-center justify-content-center" style="min-height: 100vh;"> 
+    
+    {% if active %}
+        
+    {% if password == None %}
+        <div class="d-flex flex-column align-items-center justify-content-center shadow rounded p-5" style="width:fit-content; min-width: 100px; min-height: 100px;">
+            <h5 class="text-center">Are you sure you want to be redirected to {{ short_code }}</h5>
+            <p class="text-warning fw-semibold">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                Some links may be dangerous!
+            </p>
+        </div>
+        
+        {% else %}
+        <div class="d-flex flex-column align-items-center justify-content-center shadow rounded p-5" style="width:fit-content; min-width: 100px; min-height: 100px;">
+            {% if error %}
+            <p class="fw-semibold text-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>{{ error}}</p>
+            {% endif %}
+            <h5 class="text-center">This link is protect with a password.</h5>
+            <form method="POST">
+                {% csrf_token %}
+                <label class="form-label">Password: </label>
+                <input type="text" class="form-control" required>
+                <button class="btn btn-primary my-3">Enter</button>
+            </form>
+        </div>
+        {% endif %}
+
+    {% else %}
+    <div class="d-flex flex-column align-items-center justify-content-center shadow rounded p-5" style="width:fit-content; min-width: 100px; min-height: 100px;">
+        <h5 class="text-center">We are sorry, but this link is innactive</h5>
+        <p class="text-info fw-semibold text-center">
+            <i class="bi bi-info-circle"></i>
+            The owner of this link has set it to "innactive".
+        </p>
+    </div>
+    {% endif %}
+
+</body>
+</html>

@@ -93,6 +93,7 @@ def Dashboard(request):
 
 #* ====== URL SHORTENING &  URL STUFF ===== *#
 
+@login_required
 def ShortenUrl(request):
     if request.method == "POST":
         original_url = request.POST.get("original_url", "").strip()
@@ -195,29 +196,18 @@ def ShortenUrl(request):
         "error": ""
     })
 
-
+@login_required
 def DeleteURL(request, pk):
     links = get_object_or_404(ShortenedUrl, pk = pk)
     return render(request, 'app/url_delete.html', {"links": links})
 
+@login_required
 def EditURL(request, pk):
     return render(request, "app/url_edit.html")
 
+@login_required
 def ViewURL(request, pk):
-    link = get_object_or_404(ShortenedUrl, pk = pk)
-    context = {
-        'link': link,
-        'original_url': link.original_url,
-        'short_code': link.short_code,
-        'created_at': link.created_at,
-        'owner': link.owner,
-        'custom_code': link.custom_code,
-        'expiry_date': link.expiry_date,
-        'uses': link.current_uses,
-        'max_uses': link.max_uses,
-        'password': link.url_password,
-        'active': link.is_active
-    }
+    link = get_object_or_404(ShortenedUrl, pk=pk)
 
     if request.method == "POST":
         qr_base64 = None
@@ -228,7 +218,10 @@ def ViewURL(request, pk):
             qr.save(buffered, format="PNG")
             qr_base64 = base64.b64encode(buffered.getvalue()).decode()
 
-        context_andqr = {
+            link.qr_code = qr_base64
+            link.save()
+        
+        context = {
             'link': link,
             'original_url': link.original_url,
             'short_code': link.short_code,
@@ -240,12 +233,44 @@ def ViewURL(request, pk):
             'max_uses': link.max_uses,
             'password': link.url_password,
             'active': link.is_active,
-            'qrcode_base64': qr_base64,
+            'qrcode': qr_base64
         }
-        return render(request, 'app/url_view.html', context_andqr)
+
+        return render(request, 'app/url_view.html', context)
+
+    context = {
+        'link': link,
+        'original_url': link.original_url,
+        'short_code': link.short_code,
+        'created_at': link.created_at,
+        'owner': link.owner,
+        'custom_code': link.custom_code,
+        'expiry_date': link.expiry_date,
+        'uses': link.current_uses,
+        'max_uses': link.max_uses,
+        'password': link.url_password,
+        'active': link.is_active,
+        'qrcode': link.qr_code
+    }
+
     return render(request, 'app/url_view.html', context)
 
 
 def RedirctURL(request, pk):
     link = get_object_or_404(ShortenedUrl, pk = pk)
+    context = {
+        'link': link,
+        'short_code': link.short_code
+    }
+
+    if request.method == "POST":
+        form_password = request.POST.get('password')
+        if link.url_password == form_password:
+            return redirect(link.original_url)
+        else:
+            return render(request, 'url_redirect.html', {"error": "Incorrect password!"})
+    return render(request, 'url_redirect.html', context)
+    """
+    link = get_object_or_404(ShortenedUrl, pk = pk)
     return redirect(link.original_url)
+    """

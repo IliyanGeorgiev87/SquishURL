@@ -18,15 +18,7 @@
             <div class="mb-3">
                 <p class="fw-semibold fs-5">Original URL: <span class="text-primary">{{ original_url }}</span></p>
             </div>
-            {% if custom_code != None %}
-                <div class="mb-3">
-                    <p class="fw-semibold fs-5">Short URL: <span class="text-primary" id="short_url">{{ short_code }}</span> <i class="bi bi-copy" id="copy_icon" onclick="CopyShortUrl()"></i></p>
-                </div>
-            {% else %}
-                <div class="mb-3">
-                    <p class="fw-semibold fs-5">Custom alias short URL: <span class="text-primary" id="short_url">{{ alias }}</span> <i class="bi bi-copy" id="copy_icon" onclick="CopyShortUrl()"></i></p>
-                </div>
-            {% endif %}
+            
             <div class="mb-3">
                 <p class="fw-semibold fs-5">Current uses: <span class="text-primary">{{ uses }}</span></p>
             </div>
@@ -48,18 +40,27 @@
                 {% endif %}
             </div>
 
-            {% if password != None %}
+            {% if password %}
             <div class="mb-3">
-                <p class="fw-semibold fs-5">Password: <span class="text-primary">{{ password }}</span></p>
-            </div>
-            {% endif %}
-
-            {% if qrcode_base64 %}
-            <div class="mb-3">
-                <img src="data:image/png;base64,{{ qrcode_base64 }}" alt="QR Code">
+                <p class="fw-semibold fs-5">Password: <i class="bi bi-check2 text-success"></i></p>
             </div>
             {% else %}
             <div class="mb-3">
+                <p class="fw-semibold fs-5">Password: <i class="bi bi-x-lg text-danger"></i></p>
+            </div>
+            {% endif %}
+
+            {% if qrcode %}
+            <div class="mb-3 d-flex flex-column align-items-center">
+                <img src="data:image/png;base64,{{ qrcode }}" alt="QR Code">
+
+                <a id="downloadBtn" href="data:image/png;base64,{{ qrcode }}" download="qr_code.png">
+                    <button type="button" class="btn btn-success">Download QR Code</button>
+                </a>
+
+            </div>
+            {% else %}
+            <div class="mb-3 d-flex flex-column align-items-center">
                 <form method="POST">
                     {% csrf_token %}
                     <button class="btn btn-success">Generate QR code <i class="bi bi-qr-code ms-1"></i></button>
