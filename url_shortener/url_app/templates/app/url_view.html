@@ -53,6 +53,19 @@
                 <p class="fw-semibold fs-5">Password: <span class="text-primary">{{ password }}</span></p>
             </div>
             {% endif %}
+
+            {% if qrcode_base64 %}
+            <div class="mb-3">
+                <img src="data:image/png;base64,{{ qrcode_base64 }}" alt="QR Code">
+            </div>
+            {% else %}
+            <div class="mb-3">
+                <form method="POST">
+                    {% csrf_token %}
+                    <button class="btn btn-success">Generate QR code <i class="bi bi-qr-code ms-1"></i></button>
+                </form>
+            </div>
+            {% endif %}
         
         </div>
 

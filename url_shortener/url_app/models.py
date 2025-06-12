@@ -20,3 +20,4 @@ class ShortenedUrl(models.Model):
     current_uses = models.IntegerField(default=0, null=True)
     url_password  = models.CharField(max_length=128, null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    qr_code = models.ImageField(blank=True, null=True)

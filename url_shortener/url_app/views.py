@@ -6,10 +6,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from .models import UserProfile, ShortenedUrl
 from django.shortcuts import get_object_or_404
+from django.utils.timezone import make_aware
+
 import uuid
 import time
+import qrcode
 from datetime import datetime
-from django.utils.timezone import make_aware
+import base64
+from io import BytesIO
 
 #* ===== ACCOUNT SYSTEM ===== *#
 
@@ -214,7 +218,33 @@ def ViewURL(request, pk):
         'password': link.url_password,
         'active': link.is_active
     }
+
+    if request.method == "POST":
+        qr_base64 = None
+
+        if link.short_code:
+            qr = qrcode.make(link.short_code)
+            buffered = BytesIO()
+            qr.save(buffered, format="PNG")
+            qr_base64 = base64.b64encode(buffered.getvalue()).decode()
+
+        context_andqr = {
+            'link': link,
+            'original_url': link.original_url,
+            'short_code': link.short_code,
+            'created_at': link.created_at,
+            'owner': link.owner,
+            'custom_code': link.custom_code,
+            'expiry_date': link.expiry_date,
+            'uses': link.current_uses,
+            'max_uses': link.max_uses,
+            'password': link.url_password,
+            'active': link.is_active,
+            'qrcode_base64': qr_base64,
+        }
+        return render(request, 'app/url_view.html', context_andqr)
     return render(request, 'app/url_view.html', context)
+
 
 def RedirctURL(request, pk):
     link = get_object_or_404(ShortenedUrl, pk = pk)
