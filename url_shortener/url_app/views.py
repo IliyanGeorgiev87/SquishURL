@@ -262,28 +262,39 @@ def ViewURL(request, pk):
 
 def RedirctURL(request, short_code):
     link = get_object_or_404(ShortenedUrl, short_code=short_code)
-
     context = {
         'link': link,
-        'short_code': link.short_code
     }
+    if not link.is_active:
+        return render(request, 'app/url_redirect.html', context)
+    if link.max_uses is not None and link.current_uses >= link.max_uses:
+        context['link_status_message'] = "This link has reached its maximum uses."
+        return render(request, 'app/url_redirect.html', context)
 
-    if link.url_password is not None:
+    if link.expiry_date is not None and link.expiry_date < datetime.datetime.now():
+        context['link_status_message'] = "This link has expired."
+        return render(request, 'app/url_redirect.html', context)
+    if link.url_password:
+        context['password_required'] = True
+
         if request.method == "POST":
             form_password = request.POST.get('password')
+
             if link.url_password == form_password:
                 link.current_uses += 1
                 link.save()
                 return redirect(link.original_url)
             else:
-                return render(request, 'url_redirect.html', {"error": "Incorrect password!"})
+                context['error'] = "Incorrect password!"
+                return render(request, 'app/url_redirect.html', context)
         else:
-            return render(request, 'url_redirect.html', context)
+            return render(request, 'app/url_redirect.html', context)
     else:
-        link.current_uses += 1
-        link.save()
-        return redirect(link.original_url)
-    """
-    link = get_object_or_404(ShortenedUrl, pk = pk)
-    return redirect(link.original_url)
-    """
+        context['password_required'] = False
+
+        if request.method == "POST":
+            link.current_uses += 1
+            link.save()
+            return redirect(link.original_url)
+        else:
+            return render(request, 'app/url_redirect.html', context)

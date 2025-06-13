@@ -44,6 +44,8 @@
             <a href="{% url 'create_url' %}" class="btn btn-success"><i class="bi bi-plus-circle me-1"></i> URL</a>
         </div>
 
+        <p class="small opacity-75 mb-0"><i class="bi bi-info-circle"></i> Click the URL to copy it</p>
+
         <table class="table user-select-auto">
             
             <thead>
@@ -55,18 +57,20 @@
                 </tr>
             </thead>
             
-            <tbody>
+            <tbody id="shortUrlList">
                 {% for link in links %}
-                <tr>
-                    <td scope="row">{{ "http://127.0.0.1:8000/"|add:link.short_code }}</td>
-                    <td>{{ link.created_at }}</td>
-                    <td>
-                        <a href="{% url 'delete_url' link.pk %}" class="btn btn-danger"><i class="bi bi-trash3-fill"></i></a>
-                        <a href="{% url 'edit_url' link.pk %}" class="btn btn-warning"><i class="bi bi-pencil-square"></i></a>
-                        <a href="{% url 'view_url' link.pk %}" class="btn btn-success"><i class="bi bi-link-45deg"></i></a>
-                    </td>
-                    <td>{{ link.is_active }}</td>
-                </tr>
+                    <tr>
+                        <td scope="row" id="short-url-{{ link.short_code }}">
+                            {{ "http://127.0.0.1:8000/"|add:link.short_code }}
+                        </td>
+                        <td>{{ link.created_at }}</td>
+                        <td>
+                            <a href="{% url 'delete_url' link.pk %}" class="btn btn-danger"><i class="bi bi-trash3-fill"></i></a>
+                            <a href="{% url 'edit_url' link.pk %}" class="btn btn-warning"><i class="bi bi-pencil-square"></i></a>
+                            <a href="{% url 'view_url' link.pk %}" class="btn btn-success"><i class="bi bi-link-45deg"></i></a>
+                        </td>
+                        <td>{{ link.is_active }}</td>
+                    </tr>
                 {% endfor %}
             </tbody>
         
@@ -80,3 +84,47 @@
         font-family: "Poppins", sans-serif;
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const shortUrlList = document.getElementById('shortUrlList');
+
+    if (shortUrlList) {
+        shortUrlList.addEventListener('click', function(event) {
+            const clickedCell = event.target.closest('td[id^="short-url-"]');
+
+            if (clickedCell) {
+                const urlToCopy = clickedCell.textContent.trim();
+
+                if (urlToCopy) {
+                    navigator.clipboard.writeText(urlToCopy)
+                        .then(() => {
+                            console.log('Short URL copied:', urlToCopy);
+                        })
+                        .catch(err => {
+                            console.error('Failed to copy using navigator.clipboard:', err);
+                            const tempInput = document.createElement('textarea');
+                            tempInput.value = urlToCopy;
+                            document.body.appendChild(tempInput);
+                            tempInput.select();
+                            
+                            try {
+                                const successful = document.execCommand('copy');
+                                if (successful) {
+                                    console.log('Short URL copied (fallback):', urlToCopy);
+                                } else {
+                                    console.error('Failed to copy using document.execCommand. Please copy manually:', urlToCopy);
+                                }
+                            } catch (copyErr) {
+                                console.error('Error during document.execCommand:', copyErr);
+                                console.error('Please copy the URL manually:', urlToCopy);
+                            } finally {
+                                document.body.removeChild(tempInput);
+                            }
+                        });
+                }
+            }
+        });
+    }
+});
+</script>
