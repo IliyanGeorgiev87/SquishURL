@@ -13,32 +13,38 @@
 <body class="user-select-none d-flex align-items-center justify-content-center" style="min-height: 100vh;"> 
     
     {% if link.is_active %}
-        {% if not password_required %}
-            <div class="d-flex flex-column align-items-center justify-content-center shadow rounded p-5" style="width:fit-content; min-width: 100px; min-height: 100px;">
-                <h5 class="text-center">Are you sure you want to be redirected to {{ link.original_url }}?</h5>
-                <p class="text-warning fw-semibold">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                    Some links may be dangerous!
-                </p>
-                <form method="POST">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary my-3">Proceed to Link</button>
-                </form>
-            </div>
         
+        {% if status_msg %}
+        <div class="p-5 rounded shadow d-flex align-items-center justify-content-center">
+            <p class="fw-semibold text-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>{{ status_msg }}</p>
+        </div>
         {% else %}
-            <div class="d-flex flex-column align-items-center justify-content-center shadow rounded p-5" style="width:fit-content; min-width: 100px; min-height: 100px;">
-                {% if error %}
-                    <p class="fw-semibold text-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>{{ error }}</p>
-                {% endif %}
-                <h5 class="text-center">This link is protected with a password.</h5>
-                <form method="POST">
-                    {% csrf_token %}
-                    <label for="id_password" class="form-label">Password: </label>
-                    <input type="password" id="id_password" name="password" class="form-control" required>
-                    <button type="submit" class="btn btn-primary my-3">Enter</button>
-                </form>
-            </div>
+            {% if not password_required %}
+                <div class="d-flex flex-column align-items-center justify-content-center shadow rounded p-5" style="width:fit-content; min-width: 100px; min-height: 100px;">
+                    <h5 class="text-center">Are you sure you want to be redirected to {{ link.original_url }}?</h5>
+                    <p class="text-warning fw-semibold">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Some links may be dangerous!
+                    </p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary my-3">Proceed to Link</button>
+                    </form>
+                </div>
+        
+            {% else %}
+                <div class="d-flex flex-column align-items-center justify-content-center shadow rounded p-5" style="width:fit-content; min-width: 100px; min-height: 100px;">
+                    {% if error %}
+                        <p class="fw-semibold text-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>{{ error }}</p>
+                    {% endif %}
+                    <h5 class="text-center">This link is protected with a password.</h5>
+                    <form method="POST" class="d-flex align-items-center">
+                        {% csrf_token %}
+                        <input type="password" id="id_password" name="password" class="form-control me-3" required>
+                        <button type="submit" class="btn btn-primary my-3 align-self-center">Enter</button>
+                    </form>
+                </div>
+            {% endif %}
         {% endif %}
 
     {% else %}

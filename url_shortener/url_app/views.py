@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from .models import UserProfile, ShortenedUrl
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import make_aware
@@ -265,22 +265,29 @@ def RedirctURL(request, short_code):
     context = {
         'link': link,
     }
+    
+    #* check if active (has frontend part also)
     if not link.is_active:
+        context["error"] = "This link is not active!"
         return render(request, 'app/url_redirect.html', context)
+    
+    #* check max uses
     if link.max_uses is not None and link.current_uses >= link.max_uses:
-        context['link_status_message'] = "This link has reached its maximum uses."
+        context['status_msg'] = "This link has reached its maximum uses."
         return render(request, 'app/url_redirect.html', context)
 
+    #* check expiry date
     if link.expiry_date is not None and link.expiry_date < datetime.datetime.now():
         context['link_status_message'] = "This link has expired."
         return render(request, 'app/url_redirect.html', context)
+    
     if link.url_password:
         context['password_required'] = True
 
         if request.method == "POST":
             form_password = request.POST.get('password')
 
-            if link.url_password == form_password:
+            if check_password(form_password, link.url_password):
                 link.current_uses += 1
                 link.save()
                 return redirect(link.original_url)
