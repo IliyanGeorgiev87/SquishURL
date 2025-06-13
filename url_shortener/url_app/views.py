@@ -198,8 +198,12 @@ def ShortenUrl(request):
 
 @login_required
 def DeleteURL(request, pk):
-    links = get_object_or_404(ShortenedUrl, pk = pk)
-    return render(request, 'app/url_delete.html', {"links": links})
+    link = get_object_or_404(ShortenedUrl, pk = pk)
+
+    if request.method == "POST":
+        link.delete()
+        return redirect('dashboard')
+    return render(request, 'app/url_delete.html', {"link": link})
 
 @login_required
 def EditURL(request, pk):
@@ -213,7 +217,7 @@ def ViewURL(request, pk):
         qr_base64 = None
 
         if link.short_code:
-            qr = qrcode.make(link.short_code)
+            qr = qrcode.make("http://127.0.0.1:8000/" + link.short_code)
             buffered = BytesIO()
             qr.save(buffered, format="PNG")
             qr_base64 = base64.b64encode(buffered.getvalue()).decode()
@@ -256,20 +260,29 @@ def ViewURL(request, pk):
     return render(request, 'app/url_view.html', context)
 
 
-def RedirctURL(request, pk):
-    link = get_object_or_404(ShortenedUrl, pk = pk)
+def RedirctURL(request, short_code):
+    link = get_object_or_404(ShortenedUrl, short_code=short_code)
+
     context = {
         'link': link,
         'short_code': link.short_code
     }
 
-    if request.method == "POST":
-        form_password = request.POST.get('password')
-        if link.url_password == form_password:
-            return redirect(link.original_url)
+    if link.url_password is not None:
+        if request.method == "POST":
+            form_password = request.POST.get('password')
+            if link.url_password == form_password:
+                link.current_uses += 1
+                link.save()
+                return redirect(link.original_url)
+            else:
+                return render(request, 'url_redirect.html', {"error": "Incorrect password!"})
         else:
-            return render(request, 'url_redirect.html', {"error": "Incorrect password!"})
-    return render(request, 'url_redirect.html', context)
+            return render(request, 'url_redirect.html', context)
+    else:
+        link.current_uses += 1
+        link.save()
+        return redirect(link.original_url)
     """
     link = get_object_or_404(ShortenedUrl, pk = pk)
     return redirect(link.original_url)

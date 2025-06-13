@@ -58,7 +58,7 @@
             <tbody>
                 {% for link in links %}
                 <tr>
-                    <td scope="row">{{ link.short_code }}</td>
+                    <td scope="row">{{ "http://127.0.0.1:8000/"|add:link.short_code }}</td>
                     <td>{{ link.created_at }}</td>
                     <td>
                         <a href="{% url 'delete_url' link.pk %}" class="btn btn-danger"><i class="bi bi-trash3-fill"></i></a>

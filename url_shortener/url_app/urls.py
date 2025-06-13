@@ -11,7 +11,7 @@ urlpatterns = [
     path('accounts/account/', views.AccountDetail, name='account'),
     path('accounts/account/delete', views.DeleteAccount, name='account_delete'),
     #* == REDIRECTION URL FUNC == *#
-    path('link/redirect/<str:pk>', views.RedirctURL, name='redirect'),
+    path('<str:short_code>', views.RedirctURL, name='redirect'),
     #* == DASHBOARD & APP == *#
     path('dashboard/', views.Dashboard, name='dashboard'),
     path('dashboard/link/create/', views.ShortenUrl, name = "create_url"),
