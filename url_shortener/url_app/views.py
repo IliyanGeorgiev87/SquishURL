@@ -207,7 +207,74 @@ def DeleteURL(request, pk):
 
 @login_required
 def EditURL(request, pk):
-    return render(request, "app/url_edit.html")
+    link = get_object_or_404(ShortenedUrl, pk=pk)
+
+    if request.method == "POST":
+        custom_alias = request.POST.get('custom_alias', '').strip()
+        expiry_date_str = request.POST.get('expiry_date', '').strip() # HH:MM DD/MM/YYYY
+        active_status = request.POST.get("active")
+        max_uses_str = request.POST.get("max_uses", "").strip()
+        url_password = request.POST.get("url_password", "").strip()
+
+        expiry_date = None
+        if expiry_date_str:
+            try:
+                expiry_date = datetime.strptime(expiry_date_str, '%H:%M %d/%m/%Y')
+                expiry_date = make_aware(expiry_date)
+            except ValueError:
+                return render(request, 'app/url_edit.html', {
+                    "link": link,
+                    "error": "Invalid expiry date format. Please use HH:MM DD/MM/YYYY"
+                })
+        
+        max_uses = None
+        if max_uses_str:
+            try:
+                max_uses = int(max_uses_str)
+                if max_uses < 1:
+                    return render(request, 'app/url_edit.html', {
+                        "link": link,
+                        "error": "Max uses must be at least 1."
+                    })
+            except ValueError:
+                return render(request, 'app/url_edit.html', {
+                    "link": link,
+                    "error": "Max uses must be a valid number."
+                })
+
+        is_active = True if active_status == 'on' else False
+
+        if custom_alias and custom_alias != link.custom_code:
+            if ShortenedUrl.objects.filter(custom_code=custom_alias).exists():
+                return render(request, 'app/url_edit.html', {
+                    "link": link,
+                    "error": "The provided alias is already in use. Please choose another one."
+                })
+        
+        try:
+            link.original_url = link.original_url
+            link.custom_code = custom_alias if custom_alias else None
+            link.expiry_date = expiry_date
+            link.max_uses = max_uses
+            
+            if url_password:
+                link.url_password = make_password(url_password)
+            elif not url_password and link.url_password:
+                link.url_password = None
+
+            link.is_active = is_active
+            
+            link.save()
+
+            return redirect('dashboard')
+        
+        except:
+            return render(request, 'app/url_edit.html', {
+                'link': link, 
+                "error": "Something went wrong! Please try again!"
+            })
+        
+    return render(request, "app/url_edit.html", {'link': link})
 
 @login_required
 def ViewURL(request, pk):
