@@ -12,7 +12,7 @@
 </head>
 
 <body class="user-select-none d-flex flex-column p-5 wrapper">
-    <h1 class="text-center text-primary fw-semibold mb-4">Edit URL</h1>
+    <h1 class="text-center text-warning fw-semibold mb-4">Edit URL <i class="bi bi-pencil-square"></i></h1>
     <div class="container shadow rounded p-5">
         <form method="POST" class="d-flex flex-column">
             {% csrf_token %}
@@ -71,12 +71,18 @@
                 <div class="mb-2">
                     <label class="form-label">Max uses:</label>
                     <input type="number" class="form-control" min="1" name="max_uses" value="{{ link.max_uses }}">
-                    <p>Current uses: <span class="fw-semibold text-primary opacity-50">{{ link.current_uses }}</span></p>
+                    <p class="small mt-2">Current uses: <span class="fw-semibold text-primary">{{ link.current_uses }}</span></p>
+                </div>
+            {% elif link.current_uses >= 1 %}
+                <div class="mb-2">
+                    <label class="form-label">Max uses:</label>
+                    <input type="number" class="form-control" min="{{ link.current_uses }}" name="max_uses" value="{{ link.current_uses }}">
+                    <p class="small mt-2">Current uses: <span class="fw-semibold text-primary">{{ link.current_uses }}</span></p>
                 </div>
             {% else %}
                 <div class="mb-2">
                     <label class="form-label">Max uses:</label>
-                    <input type="number" class="form-control" min="{{ link.current_uses }}" name="max_uses" value="{{ link.current_uses }}">
+                    <input type="number" class="form-control" min="1" name="max_uses" value="1">
                     <p class="small mt-2">Current uses: <span class="fw-semibold text-primary">{{ link.current_uses }}</span></p>
                 </div>
             {% endif %}
@@ -86,7 +92,8 @@
                 <input type="password" class="form-control" maxlength="20" name="url_password">
             </div>
 
-            <button type="submit" class="btn btn-primary">Confirm changes</button>
+            <button type="submit" class="btn btn-primary mt-3">Confirm changes</button>
+            <a href="{% url 'dashboard' %}" class="btn btn-danger mt-2">Dashboard <i class="bi bi-arrow-return-left ms-1"></i></a>
         </form>
 
     </div>

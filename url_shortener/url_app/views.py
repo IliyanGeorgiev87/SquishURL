@@ -7,6 +7,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from .models import UserProfile, ShortenedUrl
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import make_aware
+from django.utils import timezone
 
 import uuid
 import time
@@ -250,6 +251,7 @@ def EditURL(request, pk):
                     "link": link,
                     "error": "The provided alias is already in use. Please choose another one."
                 })
+            link.short_code = custom_alias
         
         try:
             link.original_url = link.original_url
@@ -259,7 +261,7 @@ def EditURL(request, pk):
             
             if url_password:
                 link.url_password = make_password(url_password)
-            elif not url_password and link.url_password:
+            else:
                 link.url_password = None
 
             link.is_active = is_active
@@ -344,7 +346,7 @@ def RedirctURL(request, short_code):
         return render(request, 'app/url_redirect.html', context)
 
     #* check expiry date
-    if link.expiry_date is not None and link.expiry_date < datetime.datetime.now():
+    if link.expiry_date is not None and link.expiry_date < timezone.now():
         context['link_status_message'] = "This link has expired."
         return render(request, 'app/url_redirect.html', context)
     
